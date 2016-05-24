@@ -4,9 +4,11 @@
 // @description Plays Conways' Game of Life with user's Github activity
 // @include     https://github.com/ryanml*
 // @version     1
-// @grant       none
+// @grant       GM_addStyle
 // ==/UserScript==
 (function() {
+  // Overrides opacity style for active cells
+  GM_addStyle(".calendar-graph.days-selected rect.day { opacity: 1 !important; }");
   // For now limit iterations to 500
   var MAX_ITERATIONS = 500;
   var INC = 0;
@@ -26,9 +28,10 @@
     for (var k = 1; k < columns.length; k++) {
       var x = k - 1;
       var cell = columns[k].getElementsByTagName('rect')[y];
+      cell.addEventListener('click', clickUpdateCell);
       // If cell is default color (Not filled) push 0 to the grid, else 1
       var active = cell.getAttribute('fill') == INACTIVE_HEX ? 0 : 1;
-      cell.id = "x" + x + "y" + y;
+      cell.id = x + ',' + y;
       grid[x].push(active);
     }
   }
@@ -81,10 +84,19 @@
   }
   // Updates the <rect> markup at given coordinates
   function updateCellAt(x, y, newState) {
-     var cell = document.getElementById('x' + x + 'y' + y);
+     var cell = document.getElementById(x + ',' + y);
      var stateHex = newState == 0 ? INACTIVE_HEX : ACTIVE_HEX;
      cell.setAttribute('fill', stateHex);
   }
+  // Given a click event on the cell, sets grid at cell to opposite stateHex
+  function clickUpdateCell() {
+    var slc = this.id.split(',');
+    var x = slc[0];
+    var y = slc[1];
+    var newState = grid[x][y] == 0 ? 1 : 0;
+    grid[x][y] = newState;
+    updateCellAt(x, y, newState);
+   }
   // Builds grid of appropriate length
   function buildGrid() {
     var grid = [];
