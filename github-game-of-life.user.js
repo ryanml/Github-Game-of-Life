@@ -7,14 +7,11 @@
 // @grant       GM_addStyle
 // ==/UserScript==
 (function() {
-  // For now limit iterations to 500
-  var MAX_ITERATIONS = 500;
-  var INC = 0;
   // Grid updates every 150 ms
-  var IT_INTERVAL = 150;
+  const IT_INTERVAL = 150;
   // Constant hex values
-  var INACTIVE_HEX = '#eeeeee';
-  var ACTIVE_HEX = '#1e6823';
+  const INACTIVE_HEX = '#eeeeee';
+  const ACTIVE_HEX = '#1e6823';
   // Gets the <rect> wrapper tag <g> elements
   var columns = document.getElementsByTagName('g');
   var colDepth = 7;
@@ -34,11 +31,30 @@
       grid[x].push(active);
     }
   }
-  // Grid checking interval
-  var check = setInterval(checkGrid, IT_INTERVAL);
+  // Click event function for start button. Starts and stops execution of the algorithm
+  function controlSim() {
+    if (this.className.indexOf('start') > -1) {
+      this.className = 'golBut stop';
+      this.innerHTML = 'Stop';
+      loop = setInterval(checkGrid, IT_INTERVAL);
+    }
+    else {
+      this.className = 'golBut start';
+      this.innerHTML = 'Start';
+      clearInterval(loop);
+    }
+  }
+  // Sets all cells to dead (0)
+  function clearGrid() {
+    for (var x = 0; x < grid.length; x++) {
+      for (var y = 0; y < grid[x].length; y++) {
+        grid[x][y] = 0;
+        updateCellAt(x, y, 0);
+      }
+    }
+  }
   // Loops through grid and applies Conway's algorithm to cells
   function checkGrid() {
-    if (INC < MAX_ITERATIONS) {
       for (var x = 0; x < grid.length; x++) {
         for (var y = 0; y < grid[x].length; y++) {
           var isAlive = grid[x][y] == 1 ? true : false;
@@ -58,12 +74,6 @@
           updateCellAt(x, y, grid[x][y]);
         }
       }
-      INC++;
-   }
-   else {
-     // Stops checking after maximum interval has been reached
-     clearInterval(check);
-   }
   }
   // Checks neighbors
   function getNumNeighbors(x, y) {
@@ -138,21 +148,23 @@
     contPanel.className = 'boxed-group-inner';
     contPanel.style = 'padding:10px';
     // Buttons and info
-    var playButton = document.createElement('button');
-    playButton.innerHTML = 'play';
-    playButton.className = 'golBut';
+    var stButton = document.createElement('button');
+    stButton.innerHTML = 'Start';
+    stButton.className = 'golBut start';
+    stButton.addEventListener('click', controlSim);
     var stepButton = document.createElement('button');
-    stepButton.innerHTML = 'step';
+    stepButton.innerHTML = 'Step';
     stepButton.className = 'golBut';
     var clearButton = document.createElement('button');
-    clearButton.innerHTML = 'clear';
+    clearButton.innerHTML = 'Clear';
     clearButton.className = 'golBut';
+    clearButton.addEventListener('click', clearGrid);
     var liveCellSpan = document.createElement('span');
     liveCellSpan.innerHTML = '<strong>Live Cell Count:</strong>';
     var genSpan = document.createElement('span');
     genSpan.innerHTML = '<strong>Generation #:</strong>';
     // Assemble
-    contPanel.appendChild(playButton);
+    contPanel.appendChild(stButton);
     contPanel.appendChild(stepButton);
     contPanel.appendChild(clearButton);
     contPanel.appendChild(liveCellSpan);
@@ -160,5 +172,7 @@
     golCont.appendChild(title);
     golCont.appendChild(contPanel);
     contribs.insertBefore(golCont, contAct);
+    // Remove contribution activity
+    contAct.parentNode.removeChild(contAct);
   }
 })();
