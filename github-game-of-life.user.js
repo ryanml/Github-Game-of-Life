@@ -7,8 +7,6 @@
 // @grant       GM_addStyle
 // ==/UserScript==
 (function() {
-  // Overrides opacity style for active cells
-  GM_addStyle(".calendar-graph.days-selected rect.day { opacity: 1 !important; }");
   // For now limit iterations to 500
   var MAX_ITERATIONS = 500;
   var INC = 0;
@@ -21,6 +19,7 @@
   var columns = document.getElementsByTagName('g');
   var colDepth = 7;
   var fillColumnGaps = fillGaps();
+  var ui = buildUI();
   var grid = buildGrid();
   var gridWidth = grid.length - 1;
   var gridHeight = colDepth;
@@ -118,5 +117,48 @@
     for (l = 0; l < lCellNo; l++) {
       lCol.innerHTML += cellMarkup;
     }
+  }
+  // Builds UI and adds it to the document.
+  function buildUI() {
+    // Appends needed <style> to <head>
+    GM_addStyle(".calendar-graph.days-selected rect.day { opacity: 1 !important; } " +
+                "span { margin: 0px 10px; }" +
+                ".golBut { margin: 0px 5px; width: 60px; }");
+    // Contributions tab will be the parent div
+    var contribs = document.getElementsByClassName('contributions-tab')[0];
+    var contAct = document.getElementsByClassName('js-contribution-activity')[0];
+    // Control panel container
+    var golCont = document.createElement('div');
+    golCont.className = 'boxed-group flush';
+    // Title element
+    var title = document.createElement('h3');
+    title.innerHTML = "Github's Game of Life Control Panel";
+    // Control panel div
+    var contPanel = document.createElement('div');
+    contPanel.className = 'boxed-group-inner';
+    contPanel.style = 'padding:10px';
+    // Buttons and info
+    var playButton = document.createElement('button');
+    playButton.innerHTML = 'play';
+    playButton.className = 'golBut';
+    var stepButton = document.createElement('button');
+    stepButton.innerHTML = 'step';
+    stepButton.className = 'golBut';
+    var clearButton = document.createElement('button');
+    clearButton.innerHTML = 'clear';
+    clearButton.className = 'golBut';
+    var liveCellSpan = document.createElement('span');
+    liveCellSpan.innerHTML = '<strong>Live Cell Count:</strong>';
+    var genSpan = document.createElement('span');
+    genSpan.innerHTML = '<strong>Generation #:</strong>';
+    // Assemble
+    contPanel.appendChild(playButton);
+    contPanel.appendChild(stepButton);
+    contPanel.appendChild(clearButton);
+    contPanel.appendChild(liveCellSpan);
+    contPanel.appendChild(genSpan);
+    golCont.appendChild(title);
+    golCont.appendChild(contPanel);
+    contribs.insertBefore(golCont, contAct);
   }
 })();
