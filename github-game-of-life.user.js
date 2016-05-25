@@ -15,43 +15,62 @@
   // Gets the <rect> wrapper tag <g> elements
   var columns = document.getElementsByTagName('g');
   var colDepth = 7;
+  var play = false;
   var fillColumnGaps = fillGaps();
   var ui = buildUI();
   var grid = buildGrid();
-  var gridWidth = grid.length - 1;
-  var gridHeight = colDepth;
   for (var y = 0; y < colDepth; y++) {
     for (var k = 1; k < columns.length; k++) {
       var x = k - 1;
       var cell = columns[k].getElementsByTagName('rect')[y];
       cell.addEventListener('click', clickUpdateCell);
+      cell.id = x + ',' + y;
       // If cell is default color (Not filled) push 0 to the grid, else 1
       var active = cell.getAttribute('fill') == INACTIVE_HEX ? 0 : 1;
-      cell.id = x + ',' + y;
       grid[x].push(active);
     }
   }
   // Click event function for start button. Starts and stops execution of the algorithm
   function controlSim() {
-    if (this.className.indexOf('start') > -1) {
+    if (!play) {
       this.className = 'golBut stop';
       this.innerHTML = 'Stop';
+      play = true;
       loop = setInterval(checkGrid, IT_INTERVAL);
     }
     else {
       this.className = 'golBut start';
       this.innerHTML = 'Start';
+      play = false;
       clearInterval(loop);
+    }
+  }
+  // Applies one sweep of the algorithm to the grid
+  function step() {
+    if (!play) {
+      checkGrid();
     }
   }
   // Sets all cells to dead (0)
   function clearGrid() {
     for (var x = 0; x < grid.length; x++) {
       for (var y = 0; y < grid[x].length; y++) {
-        grid[x][y] = 0;
-        updateCellAt(x, y, 0);
+        updateCellAt(x, y, grid[x][y] = 0);
       }
     }
+    updateLiveCellCount();
+  }
+  // Returns the number of live cells in the grid
+  function updateLiveCellCount() {
+    var liveCellNum = 0;
+    for (var x = 0; x < grid.length; x++) {
+      for (var y = 0; y < grid[x].length; y++) {
+        if (grid[x][y] == 1) {
+          liveCellNum++;
+        }
+      }
+    }
+    document.getElementById('lcc').innerHTML = liveCellNum;
   }
   // Loops through grid and applies Conway's algorithm to cells
   function checkGrid() {
@@ -72,6 +91,7 @@
             grid[x][y] = 1;
           }
           updateCellAt(x, y, grid[x][y]);
+          updateLiveCellCount();
         }
       }
   }
@@ -82,14 +102,13 @@
     var neighborCells = [];
     // Checks to make sure the coordinates aren't out of bounds, if not, push to neighborCells
     for (var f = 0; f < fullCoords.length; f++) {
-      if (fullCoords[f][0] >= 0 && fullCoords[f][0] <= gridWidth
+      if (fullCoords[f][0] >= 0 && fullCoords[f][0] <= (grid.length - 1)
           && fullCoords[f][1] >= 0 && fullCoords[f][1] <= colDepth - 1) {
         neighborCells.push(grid[fullCoords[f][0]][fullCoords[f][1]]);
       }
     }
     // Adds neighBorCell values via reduce, each live cell is represented by 1
-    var sum = neighborCells.reduce((c, p) => c + p);
-    return sum;
+    return neighborCells.reduce((c, p) => c + p);
   }
   // Updates the <rect> markup at given coordinates
   function updateCellAt(x, y, newState) {
@@ -100,11 +119,10 @@
   // Given a click event on the cell, sets grid at cell to opposite stateHex
   function clickUpdateCell() {
     var slc = this.id.split(',');
-    var x = slc[0];
-    var y = slc[1];
-    var newState = grid[x][y] == 0 ? 1 : 0;
-    grid[x][y] = newState;
-    updateCellAt(x, y, newState);
+    var x = slc[0], y = slc[1];
+    grid[x][y] = grid[x][y] == 0 ? 1 : 0;
+    updateCellAt(x, y, grid[x][y]);
+    updateLiveCellCount();
    }
   // Builds grid of appropriate length
   function buildGrid() {
@@ -148,27 +166,29 @@
     contPanel.className = 'boxed-group-inner';
     contPanel.style = 'padding:10px';
     // Buttons and info
+    // Start button
     var stButton = document.createElement('button');
     stButton.innerHTML = 'Start';
     stButton.className = 'golBut start';
     stButton.addEventListener('click', controlSim);
+    // Step button
     var stepButton = document.createElement('button');
     stepButton.innerHTML = 'Step';
     stepButton.className = 'golBut';
+    stepButton.addEventListener('click', step);
+    // Clear button
     var clearButton = document.createElement('button');
     clearButton.innerHTML = 'Clear';
     clearButton.className = 'golBut';
     clearButton.addEventListener('click', clearGrid);
+    // Span elements for stats
     var liveCellSpan = document.createElement('span');
-    liveCellSpan.innerHTML = '<strong>Live Cell Count:</strong>';
-    var genSpan = document.createElement('span');
-    genSpan.innerHTML = '<strong>Generation #:</strong>';
+    liveCellSpan.innerHTML = '<strong>Live Cell Count:</strong><span id ="lcc"></span>';
     // Assemble
     contPanel.appendChild(stButton);
     contPanel.appendChild(stepButton);
     contPanel.appendChild(clearButton);
     contPanel.appendChild(liveCellSpan);
-    contPanel.appendChild(genSpan);
     golCont.appendChild(title);
     golCont.appendChild(contPanel);
     contribs.insertBefore(golCont, contAct);
