@@ -16,6 +16,7 @@
   var columns = document.getElementsByTagName('g');
   var colDepth = 7;
   var play = false;
+  var generationCount = 0;
   var fillColumnGaps = fillGaps();
   var ui = buildUI();
   var grid = buildGrid();
@@ -58,7 +59,9 @@
         updateCellAt(x, y, grid[x][y] = 0);
       }
     }
+    generationCount = 0;
     updateLiveCellCount();
+    updateGenerationCount();
   }
   // Returns the number of live cells in the grid
   function updateLiveCellCount() {
@@ -71,6 +74,10 @@
       }
     }
     document.getElementById('lcc').innerHTML = liveCellNum;
+  }
+  // Updates the generation count in control panel
+  function updateGenerationCount() {
+    document.getElementById('gcc').innerHTML = generationCount;
   }
   // Loops through grid and applies Conway's algorithm to cells
   function checkGrid() {
@@ -94,6 +101,8 @@
           updateLiveCellCount();
         }
       }
+      generationCount++;
+      updateGenerationCount();
   }
   // Checks neighbors
   function getNumNeighbors(x, y) {
@@ -150,7 +159,7 @@
   function buildUI() {
     // Appends needed <style> to <head>
     GM_addStyle(" .calendar-graph.days-selected rect.day { opacity: 1 !important; } " +
-                " span { margin: 0px 10px; } " +
+                " .gol-span { display: inline-block; width: 135px; margin: 0px 10px; } " +
                 " .gol-button { margin: 0px 10px; width: 65px; height: 35px; border-radius: 5px; color: #ffffff; font-weight:bold; } " +
                 " .gol-button:focus { outline: none; } " +
                 " #play { background: #66ff33; border: 2px solid #208000; } " +
@@ -188,14 +197,20 @@
     clearButton.className = 'gol-button';
     clearButton.id = 'clear';
     clearButton.addEventListener('click', clearGrid);
-    // Span elements for stats
+    // Displays number of live cells
     var liveCellSpan = document.createElement('span');
-    liveCellSpan.innerHTML = '<strong>Live Cell Count:</strong><span id ="lcc"></span>';
+    liveCellSpan.className = 'gol-span';
+    liveCellSpan.innerHTML = '<strong>Live Cell Count: </strong><span id="lcc"></span>';
+    // Displays cycle count
+    var genCountSpan = document.createElement('span');
+    genCountSpan.className = 'gol-span';
+    genCountSpan.innerHTML = '<strong>Generation: </strong><span id="gcc">0</span>';
     // Assemble
     contPanel.appendChild(stButton);
     contPanel.appendChild(stepButton);
     contPanel.appendChild(clearButton);
     contPanel.appendChild(liveCellSpan);
+    contPanel.appendChild(genCountSpan);
     golCont.appendChild(title);
     golCont.appendChild(contPanel);
     contribs.insertBefore(golCont, contAct);
