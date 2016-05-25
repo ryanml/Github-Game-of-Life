@@ -11,7 +11,7 @@
   const IT_INTERVAL = 150;
   // Constant hex values
   const INACTIVE_HEX = '#eeeeee';
-  const ACTIVE_HEX = '#1e6823';
+  const ACTIVE_HEX_ARR = ['#d6e685', '#8cc665', '#44a340', '#1e6823'];
   // Gets the <rect> wrapper tag <g> elements
   var columns = document.getElementsByTagName('g');
   var colDepth = 7;
@@ -20,15 +20,19 @@
   var fillColumnGaps = fillGaps();
   var ui = buildUI();
   var grid = buildGrid();
-  for (var y = 0; y < colDepth; y++) {
-    for (var k = 1; k < columns.length; k++) {
-      var x = k - 1;
-      var cell = columns[k].getElementsByTagName('rect')[y];
-      cell.addEventListener('click', clickUpdateCell);
-      cell.id = x + ',' + y;
-      // If cell is default color (Not filled) push 0 to the grid, else 1
-      var active = cell.getAttribute('fill') == INACTIVE_HEX ? 0 : 1;
-      grid[x].push(active);
+  var fillGrid = fillGrid();
+  // Fills grid with initial states
+  function fillGrid() {
+    for (var y = 0; y < colDepth; y++) {
+      for (var k = 1; k < columns.length; k++) {
+        var x = k - 1;
+        var cell = columns[k].children[y];
+        cell.addEventListener('click', clickUpdateCell);
+        cell.id = x + ',' + y;
+        // If cell is default color (Not filled) push 0 to the grid, else 1
+        var active = cell.getAttribute('fill') == INACTIVE_HEX ? 0 : 1;
+        grid[x].push(active);
+      }
     }
   }
   // Click event function for play/pause button. Starts and stops execution of the algorithm
@@ -122,7 +126,7 @@
   // Updates the <rect> markup at given coordinates
   function updateCellAt(x, y, newState) {
      var cell = document.getElementById(x + ',' + y);
-     var stateHex = newState == 0 ? INACTIVE_HEX : ACTIVE_HEX;
+     var stateHex = newState == 0 ? INACTIVE_HEX : ACTIVE_HEX_ARR[Math.round(Math.random() * (ACTIVE_HEX_ARR.length - 1))];
      cell.setAttribute('fill', stateHex);
   }
   // Given a click event on the cell, sets grid at cell to opposite stateHex
