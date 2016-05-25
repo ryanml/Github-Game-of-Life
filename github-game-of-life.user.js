@@ -30,17 +30,17 @@
       grid[x].push(active);
     }
   }
-  // Click event function for start button. Starts and stops execution of the algorithm
+  // Click event function for play/pause button. Starts and stops execution of the algorithm
   function controlSim() {
     if (!play) {
-      this.className = 'golBut stop';
-      this.innerHTML = 'Stop';
+      this.id = 'pause';
+      this.innerHTML = 'Pause';
       play = true;
       loop = setInterval(checkGrid, IT_INTERVAL);
     }
     else {
-      this.className = 'golBut start';
-      this.innerHTML = 'Start';
+      this.id = 'play';
+      this.innerHTML = 'Play';
       play = false;
       clearInterval(loop);
     }
@@ -149,9 +149,14 @@
   // Builds UI and adds it to the document.
   function buildUI() {
     // Appends needed <style> to <head>
-    GM_addStyle(".calendar-graph.days-selected rect.day { opacity: 1 !important; } " +
-                "span { margin: 0px 10px; }" +
-                ".golBut { margin: 0px 5px; width: 60px; }");
+    GM_addStyle(" .calendar-graph.days-selected rect.day { opacity: 1 !important; } " +
+                " span { margin: 0px 10px; } " +
+                " .gol-button { margin: 0px 10px; width: 65px; height: 35px; border-radius: 5px; color: #ffffff; font-weight:bold; } " +
+                " .gol-button:focus { outline: none; } " +
+                " #play { background: #66ff33; border: 2px solid #208000; } " +
+                " #pause { background: #ff4d4d; border: 2px solid #cc0000; } " +
+                " #step { background: #0066ff; border: 2px solid #003380; } " +
+                " #clear { background: #e6e600; border: 2px solid #b3b300; } ");
     // Contributions tab will be the parent div
     var contribs = document.getElementsByClassName('contributions-tab')[0];
     var contAct = document.getElementsByClassName('js-contribution-activity')[0];
@@ -165,21 +170,23 @@
     var contPanel = document.createElement('div');
     contPanel.className = 'boxed-group-inner';
     contPanel.style = 'padding:10px';
-    // Buttons and info
-    // Start button
+    // Play/pause button
     var stButton = document.createElement('button');
-    stButton.innerHTML = 'Start';
-    stButton.className = 'golBut start';
+    stButton.innerHTML = 'Play';
+    stButton.className = 'gol-button';
+    stButton.id = 'play';
     stButton.addEventListener('click', controlSim);
     // Step button
     var stepButton = document.createElement('button');
     stepButton.innerHTML = 'Step';
-    stepButton.className = 'golBut';
+    stepButton.className = 'gol-button';
+    stepButton.id = 'step';
     stepButton.addEventListener('click', step);
     // Clear button
     var clearButton = document.createElement('button');
     clearButton.innerHTML = 'Clear';
-    clearButton.className = 'golBut';
+    clearButton.className = 'gol-button';
+    clearButton.id = 'clear';
     clearButton.addEventListener('click', clearGrid);
     // Span elements for stats
     var liveCellSpan = document.createElement('span');
