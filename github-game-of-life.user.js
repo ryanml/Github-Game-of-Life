@@ -7,11 +7,11 @@
 // @grant       GM_addStyle
 // ==/UserScript==
 (function() {
-  // Grid updates every 150 ms
-  const IT_INTERVAL = 150;
   // Constant hex values
   const INACTIVE_HEX = '#eeeeee';
   const ACTIVE_HEX_ARR = ['#d6e685', '#8cc665', '#44a340', '#1e6823'];
+  // Interval by default is 200ms
+  var IT_INTERVAL = 200;
   // Gets the <rect> wrapper tag <g> elements
   var columns = document.getElementsByTagName('g');
   var colDepth = 7;
@@ -66,6 +66,11 @@
     generationCount = 0;
     updateLiveCellCount();
     updateGenerationCount();
+  }
+  // Updates the interval on change of the range input
+  function updateInterval() {
+    clearInterval(loop);
+    loop = setInterval(checkGrid, IT_INTERVAL = (this.value * 10));
   }
   // Returns the number of live cells in the grid
   function updateLiveCellCount() {
@@ -126,7 +131,7 @@
   // Updates the <rect> markup at given coordinates
   function updateCellAt(x, y, newState) {
      var cell = document.getElementById(x + ',' + y);
-     var stateHex = newState == 0 ? INACTIVE_HEX : ACTIVE_HEX_ARR[Math.round(Math.random() * (ACTIVE_HEX_ARR.length - 1))];
+     var stateHex = newState == 0 ? INACTIVE_HEX : ACTIVE_HEX_ARR[Math.floor(Math.random() * (ACTIVE_HEX_ARR.length))];
      cell.setAttribute('fill', stateHex);
   }
   // Given a click event on the cell, sets grid at cell to opposite stateHex
@@ -163,16 +168,18 @@
   function buildUI() {
     // Appends needed <style> to <head>
     GM_addStyle(" .calendar-graph.days-selected rect.day { opacity: 1 !important; } " +
-                " .gol-span { display: inline-block; width: 135px; margin: 0px 10px; } " +
+                " .gol-span { display: inline-block; width: 125px; margin: 0px 10px; } " +
                 " .gol-button { margin: 0px 10px; width: 65px; height: 35px; border-radius: 5px; color: #ffffff; font-weight:bold; } " +
                 " .gol-button:focus { outline: none; } " +
                 " #play { background: #66ff33; border: 2px solid #208000; } " +
                 " #pause { background: #ff4d4d; border: 2px solid #cc0000; } " +
                 " #step { background: #0066ff; border: 2px solid #003380; } " +
-                " #clear { background: #e6e600; border: 2px solid #b3b300; } ");
+                " #clear { background: #e6e600; border: 2px solid #b3b300; } " +
+                " #gol-range { vertical-align:middle; } ");
     // Contributions tab will be the parent div
     var contribs = document.getElementsByClassName('contributions-tab')[0];
     var contAct = document.getElementsByClassName('js-contribution-activity')[0];
+    contAct.style.display = 'none';
     // Control panel container
     var golCont = document.createElement('div');
     golCont.className = 'boxed-group flush';
@@ -209,16 +216,25 @@
     var genCountSpan = document.createElement('span');
     genCountSpan.className = 'gol-span';
     genCountSpan.innerHTML = '<strong>Generation: </strong><span id="gcc">0</span>';
+    // Range input for interval adjustment
+    var rangeSpan = document.createElement('span');
+    rangeSpan.className = 'gol-span';
+    var rangeInput = document.createElement('input');
+    rangeInput.type = 'range';
+    rangeInput.id = 'gol-range';
+    // Default value 20 (for 200ms)
+    rangeInput.value = 20;
+    rangeInput.addEventListener('change', updateInterval);
+    rangeSpan.appendChild(rangeInput);
     // Assemble
     contPanel.appendChild(stButton);
     contPanel.appendChild(stepButton);
     contPanel.appendChild(clearButton);
     contPanel.appendChild(liveCellSpan);
     contPanel.appendChild(genCountSpan);
+    contPanel.appendChild(rangeSpan);
     golCont.appendChild(title);
     golCont.appendChild(contPanel);
     contribs.insertBefore(golCont, contAct);
-    // Remove contribution activity
-    contAct.parentNode.removeChild(contAct);
   }
 })();
