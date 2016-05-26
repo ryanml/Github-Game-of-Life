@@ -18,6 +18,7 @@
   var play = false;
   var colorize = false;
   var generationCount = 0;
+  var liveCellNum = 0;
   var fillColumnGaps = fillGaps();
   var ui = buildUI();
   var grid = buildGrid();
@@ -49,6 +50,7 @@
     if (!play) {
       this.id = 'pause';
       this.innerHTML = 'Pause';
+      document.getElementById('gol-info').innerHTML = '';
       play = true;
       loop = setInterval(checkGrid, IT_INTERVAL);
     }
@@ -72,9 +74,8 @@
         updateCellAt(x, y, grid[x][y] = 0);
       }
     }
-    generationCount = 0;
     updateLiveCellCount();
-    updateGenerationCount();
+    document.getElementById('gcc').innerHTML = (generationCount = 0);
   }
   // Updates the interval on change of the range input
   function updateInterval() {
@@ -88,7 +89,7 @@
   }
   // Returns the number of live cells in the grid
   function updateLiveCellCount() {
-    var liveCellNum = 0;
+    liveCellNum = 0;
     for (var x = 0; x < grid.length; x++) {
       for (var y = 0; y < grid[x].length; y++) {
         if (grid[x][y] == 1) {
@@ -98,9 +99,13 @@
     }
     document.getElementById('lcc').innerHTML = liveCellNum;
   }
-  // Updates the generation count in control panel
-  function updateGenerationCount() {
-    document.getElementById('gcc').innerHTML = generationCount;
+  // Checks if all cells are dead, displays message
+  function checkForCellDeaths() {
+    // If the simulation is being run and there are no cells left
+    if (play && liveCellNum == 0) {
+      document.getElementById('pause').click();
+      document.getElementById('gol-info').innerHTML = ' - Mass Death! All your cells have died.';
+    }
   }
   // Loops through grid and applies Conway's algorithm to cells
   function checkGrid() {
@@ -122,10 +127,10 @@
           }
           updateCellAt(x, y, grid[x][y]);
           updateLiveCellCount();
+          checkForCellDeaths();
         }
       }
-      generationCount++;
-      updateGenerationCount();
+      document.getElementById('gcc').innerHTML = ++generationCount;
   }
   // Checks neighbors
   function getNumNeighbors(x, y) {
@@ -207,7 +212,7 @@
     golCont.className = 'boxed-group flush';
     // Title element
     var title = document.createElement('h3');
-    title.innerHTML = "Github's Game of Life Control Panel";
+    title.innerHTML = "Github's Game of Life Control Panel <span id='gol-info' style='color:#ff0000'></span>";
     // Control panel div
     var contPanel = document.createElement('div');
     contPanel.className = 'boxed-group-inner';
