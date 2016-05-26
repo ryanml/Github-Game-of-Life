@@ -101,9 +101,12 @@
   }
   // Checks if all cells are dead, displays message
   function checkForCellDeaths() {
-    // If the simulation is being run and there are no cells left
-    if (play && liveCellNum == 0) {
-      document.getElementById('pause').click();
+    // Check for no cells
+    if (liveCellNum == 0) {
+      // If the simulation is being run it needs to stop
+      if (play) {
+        document.getElementById('pause').click();
+      }
       document.getElementById('gol-info').innerHTML = ' - Mass Death! All your cells have died.';
     }
   }
@@ -126,10 +129,10 @@
             grid[x][y] = 1;
           }
           updateCellAt(x, y, grid[x][y]);
-          updateLiveCellCount();
-          checkForCellDeaths();
         }
       }
+      updateLiveCellCount();
+      checkForCellDeaths();
       document.getElementById('gcc').innerHTML = ++generationCount;
   }
   // Checks neighbors
