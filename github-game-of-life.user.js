@@ -16,11 +16,20 @@
   var columns = document.getElementsByTagName('g');
   var colDepth = 7;
   var play = false;
+  var colorize = false;
   var generationCount = 0;
   var fillColumnGaps = fillGaps();
   var ui = buildUI();
   var grid = buildGrid();
   var fillGrid = fillGrid();
+  // Builds grid of appropriate length
+  function buildGrid() {
+    var grid = [];
+    for (col = 0; col < columns.length - 1; col++) {
+      grid.push([]);
+    }
+    return grid;
+  }
   // Fills grid with initial states
   function fillGrid() {
     for (var y = 0; y < colDepth; y++) {
@@ -136,7 +145,7 @@
   // Updates the <rect> markup at given coordinates
   function updateCellAt(x, y, newState) {
      var cell = document.getElementById(x + ',' + y);
-     var stateHex = newState == 0 ? INACTIVE_HEX : ACTIVE_HEX_ARR[Math.floor(Math.random() * (ACTIVE_HEX_ARR.length))];
+     var stateHex = newState == 0 ? INACTIVE_HEX : genRandomHex();
      cell.setAttribute('fill', stateHex);
   }
   // Given a click event on the cell, sets grid at cell to opposite stateHex
@@ -147,14 +156,20 @@
     updateCellAt(x, y, grid[x][y]);
     updateLiveCellCount();
    }
-  // Builds grid of appropriate length
-  function buildGrid() {
-    var grid = [];
-    for (col = 0; col < columns.length - 1; col++) {
-      grid.push([]);
-    }
-    return grid;
-  }
+   // Generates/gets the appropriate random hex value
+   function genRandomHex() {
+     var chars = 'ABCDEF0123456789';
+     var hex = '#';
+     if (!colorize) {
+       return ACTIVE_HEX_ARR[Math.floor(Math.random() * ACTIVE_HEX_ARR.length)];
+     }
+     else {
+       for (var n = 0; n < 6; n++) {
+         hex += chars[Math.floor(Math.random() * chars.length)];
+       }
+       return hex;
+     }
+   }
   // Fills gaps in the markup
   function fillGaps() {
     var fCol = columns[1];
@@ -174,7 +189,7 @@
     // Appends needed <style> to <head>
     GM_addStyle(" .calendar-graph.days-selected rect.day { opacity: 1 !important; } " +
                 " .gol-span { display: inline-block; width: 125px; margin: 0px 7px; } " +
-                " .gol-button { margin: 0px 5px; width: 65px; height: 35px; border-radius: 5px; color: #ffffff; font-weight:bold; } " +
+                " .gol-button { margin: 0px 5px; width: 55px; height: 35px; border-radius: 5px; color: #ffffff; font-weight:bold; } " +
                 " .gol-button:focus { outline: none; } " +
                 " #play { background: #66ff33; border: 2px solid #208000; } " +
                 " #pause { background: #ff4d4d; border: 2px solid #cc0000; } " +
@@ -239,6 +254,13 @@
     rangeInput.addEventListener('change', updateInterval);
     rangeSpan.appendChild(rangeLabel);
     rangeSpan.appendChild(rangeInput);
+    // Checkbox for colorize
+    var colorCheck = document.createElement('input');
+    colorCheck.type = 'checkbox';
+    colorCheck.style = 'vertical-align:middle';
+    colorCheck.addEventListener('change', function() {
+      colorize = this.checked ? true : false;
+    });
     // Assemble
     contPanel.appendChild(stButton);
     contPanel.appendChild(stepButton);
@@ -246,6 +268,7 @@
     contPanel.appendChild(liveCellSpan);
     contPanel.appendChild(genCountSpan);
     contPanel.appendChild(rangeSpan);
+    contPanel.appendChild(colorCheck);
     golCont.appendChild(title);
     golCont.appendChild(contPanel);
     contribs.insertBefore(golCont, contAct);
