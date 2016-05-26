@@ -69,8 +69,13 @@
   }
   // Updates the interval on change of the range input
   function updateInterval() {
-    clearInterval(loop);
-    loop = setInterval(checkGrid, IT_INTERVAL = (this.value * 10));
+    IT_INTERVAL = this.value == 0 ? ((this.value + 1) * 10) : (this.value * 10);
+    // If animation is playing, set new interval loop
+    if (play) {
+      clearInterval(loop);
+      loop = setInterval(checkGrid, IT_INTERVAL);
+    }
+    document.getElementById('icc').innerHTML = IT_INTERVAL;
   }
   // Returns the number of live cells in the grid
   function updateLiveCellCount() {
@@ -168,14 +173,16 @@
   function buildUI() {
     // Appends needed <style> to <head>
     GM_addStyle(" .calendar-graph.days-selected rect.day { opacity: 1 !important; } " +
-                " .gol-span { display: inline-block; width: 125px; margin: 0px 10px; } " +
-                " .gol-button { margin: 0px 10px; width: 65px; height: 35px; border-radius: 5px; color: #ffffff; font-weight:bold; } " +
+                " .gol-span { display: inline-block; width: 125px; margin: 0px 7px; } " +
+                " .gol-button { margin: 0px 5px; width: 65px; height: 35px; border-radius: 5px; color: #ffffff; font-weight:bold; } " +
                 " .gol-button:focus { outline: none; } " +
                 " #play { background: #66ff33; border: 2px solid #208000; } " +
                 " #pause { background: #ff4d4d; border: 2px solid #cc0000; } " +
                 " #step { background: #0066ff; border: 2px solid #003380; } " +
                 " #clear { background: #e6e600; border: 2px solid #b3b300; } " +
-                " #gol-range { vertical-align:middle; } ");
+                " #gol-range-span { width: 190px; } " +
+                " #gol-range-lbl { margin-right: 5px; } " +
+                " #gol-range { vertical-align:middle; width: 100px; } ");
     // Contributions tab will be the parent div
     var contribs = document.getElementsByClassName('contributions-tab')[0];
     var contAct = document.getElementsByClassName('js-contribution-activity')[0];
@@ -215,16 +222,22 @@
     // Displays cycle count
     var genCountSpan = document.createElement('span');
     genCountSpan.className = 'gol-span';
+    genCountSpan.style = 'width:105px';
     genCountSpan.innerHTML = '<strong>Generation: </strong><span id="gcc">0</span>';
     // Range input for interval adjustment
     var rangeSpan = document.createElement('span');
     rangeSpan.className = 'gol-span';
+    rangeSpan.id = 'gol-range-span';
+    var rangeLabel = document.createElement('span');
+    rangeLabel.id = 'gol-range-lbl';
+    rangeLabel.innerHTML = '<strong>Int (ms): </strong><span id="icc">200</span>'
     var rangeInput = document.createElement('input');
     rangeInput.type = 'range';
     rangeInput.id = 'gol-range';
     // Default value 20 (for 200ms)
     rangeInput.value = 20;
     rangeInput.addEventListener('change', updateInterval);
+    rangeSpan.appendChild(rangeLabel);
     rangeSpan.appendChild(rangeInput);
     // Assemble
     contPanel.appendChild(stButton);
