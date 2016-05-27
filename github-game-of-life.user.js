@@ -205,20 +205,25 @@
       lCol.innerHTML += cellMarkup;
     }
   }
+  // Sets colorize variable on change
+  function setColorize() {
+    colorize = this.checked ? true : false;
+  }
   // Builds UI and adds it to the document.
   function buildUI() {
     // Appends needed <style> to <head>
     GM_addStyle(" .calendar-graph.days-selected rect.day { opacity: 1 !important; } " +
-                " .gol-span { display: inline-block; width: 125px; margin: 0px 7px; } " +
-                " .gol-button { margin: 0px 5px; width: 55px; height: 35px; border-radius: 5px; color: #ffffff; font-weight:bold; } " +
-                " .gol-button:focus { outline: none; } " +
-                " #play { background: #66ff33; border: 2px solid #208000; } " +
-                " #pause { background: #ff4d4d; border: 2px solid #cc0000; } " +
-                " #step { background: #0066ff; border: 2px solid #003380; } " +
-                " #clear { background: #e6e600; border: 2px solid #b3b300; } " +
-                " #gol-range-span { width: 190px; } " +
-                " #gol-range-lbl { margin-right: 5px; } " +
-                " #gol-range { vertical-align:middle; width: 100px; } ");
+      " .gol-span { display: inline-block; width: 125px; margin: 0px 7px; } " +
+      " .gol-button { margin: 0px 3px; width: 50px; height: 35px; border-radius: 5px; color: #ffffff; font-weight:bold; font-size: 11px; } " +
+      " .gol-button:focus { outline: none; } " +
+      " #play { background: #66ff33; border: 2px solid #208000; } " +
+      " #pause { background: #ff4d4d; border: 2px solid #cc0000; } " +
+      " #step { background: #0066ff; border: 2px solid #003380; } " +
+      " #clear { background: #e6e600; border: 2px solid #b3b300; } " +
+      " #reset { background: #ff9900; border: 2px solid #cc7a00; } " +
+      " #gol-range-span { width: 190px; } " +
+      " #gol-range-lbl { margin-right: 5px; } " +
+      " #gol-range { vertical-align:middle; width: 100px; } ");
     // Contributions tab will be the parent div
     var contribs = document.getElementsByClassName('contributions-tab')[0];
     var contAct = document.getElementsByClassName('js-contribution-activity')[0];
@@ -226,76 +231,27 @@
     // Control panel container
     var golCont = document.createElement('div');
     golCont.className = 'boxed-group flush';
-    // Title element
-    var title = document.createElement('h3');
-    title.innerHTML = "Github's Game of Life Control Panel <span id='gol-info' style='color:#ff0000'></span>";
-    // Control panel div
-    var contPanel = document.createElement('div');
-    contPanel.className = 'boxed-group-inner';
-    contPanel.style = 'padding:10px';
-    // Play/pause button
-    var stButton = document.createElement('button');
-    stButton.innerHTML = 'Play';
-    stButton.className = 'gol-button';
-    stButton.id = 'play';
-    stButton.addEventListener('click', controlSim);
-    // Step button
-    var stepButton = document.createElement('button');
-    stepButton.innerHTML = 'Step';
-    stepButton.className = 'gol-button';
-    stepButton.id = 'step';
-    stepButton.addEventListener('click', step);
-    // Clear button
-    var clearButton = document.createElement('button');
-    clearButton.innerHTML = 'Clear';
-    clearButton.className = 'gol-button';
-    clearButton.id = 'clear';
-    clearButton.addEventListener('click', clearGrid);
-    // Displays number of live cells
-    var liveCellSpan = document.createElement('span');
-    liveCellSpan.className = 'gol-span';
-    liveCellSpan.innerHTML = '<strong>Live Cell Count: </strong><span id="lcc"></span>';
-    // Displays cycle count
-    var genCountSpan = document.createElement('span');
-    genCountSpan.className = 'gol-span';
-    genCountSpan.style = 'width:105px';
-    genCountSpan.innerHTML = '<strong>Generation: </strong><span id="gcc">0</span>';
-    // Range input for interval adjustment
-    var rangeSpan = document.createElement('span');
-    rangeSpan.className = 'gol-span';
-    rangeSpan.id = 'gol-range-span';
-    var rangeLabel = document.createElement('span');
-    rangeLabel.id = 'gol-range-lbl';
-    rangeLabel.innerHTML = '<strong>Int (ms): </strong><span id="icc">200</span>'
-    var rangeInput = document.createElement('input');
-    rangeInput.type = 'range';
-    rangeInput.id = 'gol-range';
-    // Default value 20 (for 200ms)
-    rangeInput.value = 20;
-    rangeInput.addEventListener('change', updateInterval);
-    rangeSpan.appendChild(rangeLabel);
-    rangeSpan.appendChild(rangeInput);
-    // Checkbox for colorize
-    var colorCheck = document.createElement('input');
-    colorCheck.type = 'checkbox';
-    colorCheck.style = 'vertical-align:middle';
-    colorCheck.addEventListener('change', function() {
-      colorize = this.checked ? true : false;
-    });
-    // Reset button
-    var resetButton = document.createElement('button');
-    resetButton.addEventListener('click', resetGrid);
-    // Assemble
-    contPanel.appendChild(stButton);
-    contPanel.appendChild(stepButton);
-    contPanel.appendChild(clearButton);
-    contPanel.appendChild(liveCellSpan);
-    contPanel.appendChild(genCountSpan);
-    contPanel.appendChild(rangeSpan);
-    contPanel.appendChild(colorCheck);
-    contPanel.appendChild(resetButton);
-    golCont.appendChild(title);
-    golCont.appendChild(contPanel);
+    var markUp = "<h3>Github's Game of Life Control Panel <span id='gol-info' style='color:#ff0000'></span></h3>" +
+      "<div class='boxed-group-inner' style='padding:10px'>" +
+      "<button class='gol-button' id='play'>Play</button>" +
+      "<button class='gol-button' id='step'>Step</button>" +
+      "<button class='gol-button' id='clear'>Clear</button>" +
+      "<button class='gol-button' id='reset'>Reset</button>" +
+      "<span class='gol-span'><strong>Live Cell Count: </strong><span id='lcc'></span></span>" +
+      "<span class='gol-span' style='width:105px'><strong>Generation: </strong><span id='gcc'>0</span></span>" +
+      "<span class='gol-span' id='gol-range-span'>" +
+      "<span id='gol-range-lbl'><strong>Int (ms): </strong><span id='icc'>200</span></span>" +
+      "<input type='range' id='gol-range' value='20'/>" +
+      "</span>" +
+      "<input type='checkbox' id='color-check' style='vertical-align:middle'/>" +
+      "</div>";
+    golCont.innerHTML = markUp;
     contribs.insertBefore(golCont, contAct);
+    document.getElementById('play').addEventListener('click', controlSim);
+    document.getElementById('step').addEventListener('click', step);
+    document.getElementById('clear').addEventListener('click', clearGrid);
+    document.getElementById('gol-range').addEventListener('change', updateInterval);
+    document.getElementById('color-check').addEventListener('change', setColorize);
+    document.getElementById('reset').addEventListener('click', resetGrid);
   }
 })();
