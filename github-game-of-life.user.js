@@ -22,6 +22,7 @@
   var fillColumnGaps = fillGaps();
   var ui = buildUI();
   var grid = buildGrid();
+  var originalState = buildGrid();
   var fillGrid = fillGrid();
   // Builds grid of appropriate length
   function buildGrid() {
@@ -30,6 +31,16 @@
       grid.push([]);
     }
     return grid;
+  }
+  // Resets grid to original state
+  function resetGrid() {
+    for (var x = 0; x < originalState.length; x++) {
+      for (var y = 0; y < originalState[x].length; y++) {
+        grid[x][y] = originalState[x][y][1];
+        document.getElementById(x + ',' + y).setAttribute('fill', originalState[x][y][0]);
+      }
+    }
+    document.getElementById('gol-info').innerHTML = '';
   }
   // Fills grid with initial states
   function fillGrid() {
@@ -40,7 +51,9 @@
         cell.addEventListener('click', clickUpdateCell);
         cell.id = x + ',' + y;
         // If cell is default color (Not filled) push 0 to the grid, else 1
-        var active = cell.getAttribute('fill') == INACTIVE_HEX ? 0 : 1;
+        var fill = cell.getAttribute('fill');
+        var active = fill == INACTIVE_HEX ? 0 : 1;
+        originalState[x].push([fill, active]);
         grid[x].push(active);
       }
     }
@@ -269,6 +282,9 @@
     colorCheck.addEventListener('change', function() {
       colorize = this.checked ? true : false;
     });
+    // Reset button
+    var resetButton = document.createElement('button');
+    resetButton.addEventListener('click', resetGrid);
     // Assemble
     contPanel.appendChild(stButton);
     contPanel.appendChild(stepButton);
@@ -277,6 +293,7 @@
     contPanel.appendChild(genCountSpan);
     contPanel.appendChild(rangeSpan);
     contPanel.appendChild(colorCheck);
+    contPanel.appendChild(resetButton);
     golCont.appendChild(title);
     golCont.appendChild(contPanel);
     contribs.insertBefore(golCont, contAct);
