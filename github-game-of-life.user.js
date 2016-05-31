@@ -2,7 +2,7 @@
 // @name        Github's Game of Life
 // @namespace   https://github.com/ryanml
 // @description Plays Conways' Game of Life with user's Github activity
-// @include     https://github.com/ryanml*
+// @include     https://github.com/*
 // @version     1
 // @grant       GM_addStyle
 // ==/UserScript==
@@ -193,16 +193,25 @@
    }
   // Fills gaps in the markup
   function fillGaps() {
+    // Gets the needed number of cells and most recent y value for first row
     var fCol = columns[1];
-    var fCellNo = (colDepth - fCol.children.length);
+    var fNodes = fCol.children;
+    var fCellNo = (colDepth - fNodes.length);
+    var fCellY = fNodes[0].getAttribute('y');
+    var nextfCellY = parseInt(fCellY) - 13;
+    // Gets the needed number of cells and most recent y value for last row
     var lCol = columns[columns.length - 1];
-    var lCellNo = (colDepth - lCol.children.length);
-    var cellMarkup = '<rect style="display:none" fill="' + INACTIVE_HEX + '"></rect>'
+    var lNodes = lCol.children;
+    var lCellNo = (colDepth - lNodes.length);
+    var lCellY = lNodes[lNodes.length - 1].getAttribute('y');
+    var nextlCellY = parseInt(lCellY) + 13;
     for (f = 0; f < fCellNo; f++) {
-      fCol.innerHTML = (cellMarkup + fCol.innerHTML);
+      fCol.innerHTML = ('<rect class="day" width="11" height="11" y="' + nextfCellY + '" fill="' + INACTIVE_HEX + '"></rect>' + fCol.innerHTML);
+      nextfCellY -= 13;
     }
     for (l = 0; l < lCellNo; l++) {
-      lCol.innerHTML += cellMarkup;
+      lCol.innerHTML += '<rect class="day" width="11" height="11" y="' + nextlCellY + '" fill="' + INACTIVE_HEX + '"></rect>';
+      nextlCellY += 13;
     }
   }
   // Sets colorize variable on change
