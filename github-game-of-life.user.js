@@ -235,6 +235,7 @@
       " #gol-range { vertical-align:middle; width: 100px; } ");
     // Contributions tab will be the parent div
     var contribs = document.getElementsByClassName('contributions-tab')[0];
+    var contParent = document.getElementsByClassName('js-repo-filter')[0];
     var contAct = document.getElementsByClassName('js-contribution-activity')[0];
     contAct.style.display = 'none';
     // Control panel container
@@ -255,7 +256,10 @@
       "<input type='checkbox' id='color-check' style='vertical-align:middle'/>" +
       "</div>";
     golCont.innerHTML = markUp;
-    contribs.insertBefore(golCont, contAct);
+    // The markup can vary by user, different elements can be the parent of the contribution activity
+    var actParent = contParent.children.length > 1 ? contParent : contribs;
+    actParent.insertBefore(golCont, contAct);
+    // Add events
     document.getElementById('play').addEventListener('click', controlSim);
     document.getElementById('step').addEventListener('click', step);
     document.getElementById('clear').addEventListener('click', clearGrid);
