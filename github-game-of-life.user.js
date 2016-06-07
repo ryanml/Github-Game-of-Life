@@ -7,6 +7,8 @@
 // @grant       GM_addStyle
 // ==/UserScript==
 (function() {
+  // Strict mode
+  'use strict';
   // Constant hex values
   const INACTIVE_HEX = '#eeeeee';
   const ACTIVE_HEX_ARR = ['#d6e685', '#8cc665', '#44a340', '#1e6823'];
@@ -19,6 +21,8 @@
   var colorize = false;
   var generationCount = 0;
   var liveCellNum = 0;
+  var play = false;
+  var loop;
   var fillColumnGaps = fillGaps();
   var ui = buildUI();
   var grid = buildGrid();
@@ -27,7 +31,7 @@
   // Builds grid of appropriate length
   function buildGrid() {
     var grid = [];
-    for (col = 0; col < columns.length - 1; col++) {
+    for (var col = 0; col < columns.length - 1; col++) {
       grid.push([]);
     }
     return grid;
@@ -40,7 +44,9 @@
         document.getElementById(x + ',' + y).setAttribute('fill', originalState[x][y][0]);
       }
     }
+    updateLiveCellCount();
     document.getElementById('gol-info').innerHTML = '';
+    document.getElementById('gcc').innerHTML = (generationCount = 0);
   }
   // Fills grid with initial states
   function fillGrid() {
@@ -55,6 +61,7 @@
         var active = fill == INACTIVE_HEX ? 0 : 1;
         originalState[x].push([fill, active]);
         grid[x].push(active);
+        updateLiveCellCount();
       }
     }
   }
@@ -205,11 +212,11 @@
     var lCellNo = (colDepth - lNodes.length);
     var lCellY = lNodes[lNodes.length - 1].getAttribute('y');
     var nextlCellY = parseInt(lCellY) + 13;
-    for (f = 0; f < fCellNo; f++) {
+    for (var f = 0; f < fCellNo; f++) {
       fCol.innerHTML = ('<rect class="day" width="11" height="11" y="' + nextfCellY + '" fill="' + INACTIVE_HEX + '"></rect>' + fCol.innerHTML);
       nextfCellY -= 13;
     }
-    for (l = 0; l < lCellNo; l++) {
+    for (var l = 0; l < lCellNo; l++) {
       lCol.innerHTML += '<rect class="day" width="11" height="11" y="' + nextlCellY + '" fill="' + INACTIVE_HEX + '"></rect>';
       nextlCellY += 13;
     }
