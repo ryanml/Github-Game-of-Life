@@ -242,7 +242,7 @@
       " #gol-range { vertical-align:middle; width: 100px; } ");
     // Contributions tab will be the parent div
     var overTab = document.getElementsByClassName('overview-tab')[0];
-    var contAct = document.getElementsByClassName('js-contribution-activity')[0];
+    var contAct = document.getElementById('js-contribution-activity');
     contAct.style.display = 'none';
     // Control panel container
     var golCont = document.createElement('div');
