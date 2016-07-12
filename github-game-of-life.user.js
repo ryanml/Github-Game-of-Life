@@ -229,7 +229,7 @@
   function buildUI() {
     // Appends needed <style> to <head>
     GM_addStyle(" .calendar-graph.days-selected rect.day { opacity: 1 !important; } " +
-      " .gol-span { display: inline-block; width: 125px; margin: 0px 7px; } " +
+      " .gol-span { display: inline-block; width: 125px; margin: 0px 7px; font-size: 90%; } " +
       " .gol-button { margin: 0px 3px; width: 50px; height: 35px; border-radius: 5px; color: #ffffff; font-weight:bold; font-size: 11px; } " +
       " .gol-button:focus { outline: none; } " +
       " #play { background: #66ff33; border: 2px solid #208000; } " +
