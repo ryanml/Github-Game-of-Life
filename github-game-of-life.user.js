@@ -229,7 +229,7 @@
   function buildUI() {
     // Appends needed <style> to <head>
     GM_addStyle(" .calendar-graph.days-selected rect.day { opacity: 1 !important; } " +
-      " .gol-span { display: inline-block; width: 125px; margin: 0px 7px; font-size: 90%; } " +
+      " .gol-span { display: inline-block; width: 125px; margin: 0px 6px; font-size: 90%; } " +
       " .gol-button { margin: 0px 3px; width: 50px; height: 35px; border-radius: 5px; color: #ffffff; font-weight:bold; font-size: 11px; } " +
       " .gol-button:focus { outline: none; } " +
       " #play { background: #66ff33; border: 2px solid #208000; } " +
@@ -241,12 +241,12 @@
       " #gol-range-lbl { margin-right: 5px; } " +
       " #gol-range { vertical-align:middle; width: 100px; } ");
     // Contributions tab will be the parent div
-    var overTab = document.getElementsByClassName('overview-tab')[0];
-    var contAct = document.getElementById('js-contribution-activity');
-    contAct.style.display = 'none';
+    var overTab = document.getElementsByClassName('mb-5')[0];
+    overTab.style = 'padding-bottom:0px !important';
     // Control panel container
     var golCont = document.createElement('div');
     golCont.className = 'boxed-group flush';
+    golCont.style = 'margin-bottom:0px';
     var markUp = "<h3>Github's Game of Life Control Panel <span id='gol-info' style='color:#ff0000'></span></h3>" +
       "<div class='boxed-group-inner' style='padding:10px'>" +
       "<button class='gol-button' id='play'>Play</button>" +
@@ -262,7 +262,7 @@
       "<input type='checkbox' id='color-check' style='vertical-align:middle'/>" +
       "</div>";
     golCont.innerHTML = markUp;
-    overTab.insertBefore(golCont, contAct);
+    overTab.appendChild(golCont);;
     // Add events
     document.getElementById('play').addEventListener('click', controlSim);
     document.getElementById('step').addEventListener('click', step);
