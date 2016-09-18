@@ -262,7 +262,7 @@
       "<input type='checkbox' id='color-check' style='vertical-align:middle'/>" +
       "</div>";
     golCont.innerHTML = markUp;
-    overTab.appendChild(golCont);;
+    overTab.appendChild(golCont);
     // Add events
     document.getElementById('play').addEventListener('click', controlSim);
     document.getElementById('step').addEventListener('click', step);
