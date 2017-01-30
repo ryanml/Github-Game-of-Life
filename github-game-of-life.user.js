@@ -14,15 +14,14 @@
   const ACTIVE_HEX_ARR = ['#d6e685', '#8cc665', '#44a340', '#1e6823'];
   // Interval by default is 200ms
   var IT_INTERVAL = 200;
-  // Gets the <rect> wrapper tag <g> elements
+  // Gets the <rect> wrapper tag <g> element
+  var loop;
   var columns = document.getElementsByTagName('g');
-  var colDepth = 7;
-  var play = false;
+  var colDepth = 7; 
   var colorize = false;
   var generationCount = 0;
   var liveCellNum = 0;
-  var play = false;
-  var loop;
+  var play = false; 
   var fillColumnGaps = fillGaps();
   var ui = buildUI();
   var grid = buildGrid();
@@ -139,7 +138,7 @@
           if (isAlive && nC < 2) {
             grid[x][y] = 0;
           }
-          else if (isAlive && nC == 2 || nC == 3) {
+          else if (isAlive && (nC == 2 || nC == 3)) {
             grid[x][y] = 1;
           }
           else if (isAlive && nC > 3) {
